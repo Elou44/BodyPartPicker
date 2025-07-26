@@ -44,6 +44,10 @@ loader.load(
         const box = new THREE.Box3().setFromObject(model);
         const center = box.getCenter(new THREE.Vector3());
 
+        // On crée un assistant visuel pour la boîte et on l'ajoute à la scène.
+        const boxHelper = new THREE.Box3Helper(box, 0xffff00); // 0xffff00 est la couleur jaune
+        scene.add(boxHelper);
+
         // 2. On parcourt tous les éléments du modèle (car il peut y en avoir plusieurs).
         model.traverse((child) => {
             // 3. Si l'élément est un maillage visible (un Mesh)...

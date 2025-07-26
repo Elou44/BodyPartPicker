@@ -32,6 +32,7 @@ scene.add(directionalLight);
 
 const loader = new GLTFLoader();
 let model = null; // Variable pour stocker notre mannequin
+let boxHelper = null;
 
 loader.load(
     'human-model.glb', // Nom du fichier du modèle
@@ -72,7 +73,7 @@ loader.load(
 
         // --- ATTACHER LA BOX AU MODÈLE (NOUVELLE MÉTHODE) ---
         // 1. On utilise BoxHelper qui prend le "model" directement en paramètre.
-        const boxHelper = new THREE.BoxHelper(model, 0xffff00); // Couleur jaune
+        boxHelper = new THREE.BoxHelper(model, 0xffff00); // Couleur jaune
         // 2. On l'ajoute à la scène.
         scene.add(boxHelper);
         // --- FIN ---

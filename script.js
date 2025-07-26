@@ -70,7 +70,7 @@ loader.load(
                 // 4. On déplace directement sa GÉOMÉTRIE.
                 // On la translate de la valeur inverse du centre.
                 // Cela recentre physiquement tous les points du maillage autour de son pivot (0,0,0).
-                child.geometry.translate(0, -1, 0);
+                child.geometry.translate(0, -5, 0);
             }
         });
 
@@ -125,7 +125,7 @@ spinButton.addEventListener('click', () => {
         x: targetRotation.x,
         y: targetRotation.y,
         z: targetRotation.z,
-        duration: 3, // Durée de l'animation en secondes
+        duration: 10, // Durée de l'animation en secondes
         ease: "power2.out", // Ralentissement à la fin
         onComplete: () => {
             // 4. Réactiver le bouton une fois l'animation terminée

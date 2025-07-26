@@ -75,8 +75,7 @@ loader.load(
         // 1. On utilise BoxHelper qui prend le "model" directement en paramètre.
         boxHelper = new THREE.BoxHelper(model, 0xffff00); // Couleur jaune
         // 2. On l'ajoute à la scène.
-        scene.add(boxHelper);
-        // --- FIN ---
+        model.add(boxHelper); // attache le boxHelper AU modèle
 
         console.log("Modèle chargé et géométrie centrée !");
     },
@@ -135,10 +134,6 @@ window.addEventListener('resize', () => {
 
 function animate() {
     requestAnimationFrame(animate);
-
-    if (model && boxHelper) {
-        boxHelper.update(); // Important !
-    }
 
     renderer.render(scene, camera);
 }

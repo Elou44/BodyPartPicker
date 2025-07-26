@@ -103,7 +103,7 @@ spinButton.addEventListener('click', () => {
     };
 
     // 3. Animer la rotation avec GSAP pour un effet fluide
-    gsap.to(model.rotation, {
+    gsap.to(boxHelper.rotation, {
         x: targetRotation.x,
         y: targetRotation.y,
         z: targetRotation.z,

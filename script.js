@@ -83,18 +83,14 @@ loader.load(
         const scale = 2.0 / maxDim;
         model.scale.set(scale, scale, scale);
 
-         
-
-        
-
         scene.add(model);
 
 
         // --- ATTACHER LA BOX AU MODÈLE (NOUVELLE MÉTHODE) ---
         // 1. On utilise BoxHelper qui prend le "model" directement en paramètre.
-        boxHelper = new THREE.BoxHelper(model, 0xffff00); // Couleur jaune
+        //boxHelper = new THREE.BoxHelper(model, 0xffff00); // Couleur jaune
         // 2. On l'ajoute à la scène.
-        model.add(boxHelper); // attache le boxHelper AU modèle
+        //model.add(boxHelper); // attache le boxHelper AU modèle
 
         console.log("Modèle chargé et géométrie centrée !");
     },

@@ -69,7 +69,7 @@ loader.load(
                 // 4. On déplace directement sa GÉOMÉTRIE.
                 // On la translate de la valeur inverse du centre.
                 // Cela recentre physiquement tous les points du maillage autour de son pivot (0,0,0).
-                child.geometry.translate(-center.x, -center.y + size.y / 2, -center.z);
+                child.geometry.translate(0, 100, 0);
             }
         });
 

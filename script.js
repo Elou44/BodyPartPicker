@@ -45,8 +45,8 @@ loader.load(
         const center = box.getCenter(new THREE.Vector3());
 
         // On crée un assistant visuel pour la boîte et on l'ajoute à la scène.
-        const boxHelper = new THREE.Box3Helper(box, 0xffff00); // 0xffff00 est la couleur jaune
-        scene.add(boxHelper);
+        //const boxHelper = new THREE.Box3Helper(box, 0xffff00); // 0xffff00 est la couleur jaune
+        //scene.add(boxHelper);
 
         // 2. On parcourt tous les éléments du modèle (car il peut y en avoir plusieurs).
         model.traverse((child) => {
@@ -68,6 +68,15 @@ loader.load(
         model.scale.set(scale, scale, scale);
 
         scene.add(model);
+
+
+        // --- ATTACHER LA BOX AU MODÈLE (NOUVELLE MÉTHODE) ---
+        // 1. On utilise BoxHelper qui prend le "model" directement en paramètre.
+        const boxHelper = new THREE.BoxHelper(model, 0xffff00); // Couleur jaune
+        // 2. On l'ajoute à la scène.
+        scene.add(boxHelper);
+        // --- FIN ---
+
         console.log("Modèle chargé et géométrie centrée !");
     },
     undefined, // Fonction de progression (non utilisée ici)

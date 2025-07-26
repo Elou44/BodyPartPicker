@@ -1,0 +1,66 @@
+/* Réinitialisation de base et style global */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* Empêche les barres de défilement */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Style du canvas 3D */
+#render-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* Conteneur de la flèche de sélection */
+.pointer-arrow {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Centrage parfait */
+    z-index: 3; /* Au-dessus de tout */
+    pointer-events: none; /* Permet de cliquer "à travers" la flèche */
+}
+
+/* Style du bouton "Spin" */
+#spin-button {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2; /* Au-dessus du canvas, mais sous la flèche */
+    
+    padding: 15px 35px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: white;
+    background-color: #007bff;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+#spin-button:hover {
+    background-color: #0056b3;
+    transform: translateX(-50%) scale(1.05);
+}
+
+/* Style du bouton lorsqu'il est désactivé */
+#spin-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    transform: translateX(-50%);
+    opacity: 0.7;
+}

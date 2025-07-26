@@ -38,18 +38,33 @@ loader.load(
     (gltf) => {
         model = gltf.scene;
 
-        // Centrer et redimensionner le modèle
+        // --- NOUVELLE MÉTHODE DE CENTRAGE PLUS ROBUSTE ---
+
+        // 1. On calcule la boîte qui entoure l'objet pour trouver son centre.
         const box = new THREE.Box3().setFromObject(model);
         const center = box.getCenter(new THREE.Vector3());
+
+        // 2. On parcourt tous les éléments du modèle (car il peut y en avoir plusieurs).
+        model.traverse((child) => {
+            // 3. Si l'élément est un maillage visible (un Mesh)...
+            if (child.isMesh) {
+                // 4. On déplace directement sa GÉOMÉTRIE.
+                // On la translate de la valeur inverse du centre.
+                // Cela recentre physiquement tous les points du maillage autour de son pivot (0,0,0).
+                child.geometry.translate(-center.x, -center.y, -center.z);
+            }
+        });
+
+        // Maintenant que la géométrie est centrée, on peut redimensionner le modèle
+        // pour qu'il ait une bonne taille dans la scène. L'objet "model" lui-même
+        // reste à la position (0,0,0).
         const size = box.getSize(new THREE.Vector3());
         const maxDim = Math.max(size.x, size.y, size.z);
-        const scale = 2.0 / maxDim; // Vise une hauteur de 2 unités Three.js
-
+        const scale = 2.0 / maxDim;
         model.scale.set(scale, scale, scale);
-        model.position.sub(center.multiplyScalar(scale));
-        
+
         scene.add(model);
-        console.log("Modèle chargé et centré !");
+        console.log("Modèle chargé et géométrie centrée !");
     },
     undefined, // Fonction de progression (non utilisée ici)
     (error) => {

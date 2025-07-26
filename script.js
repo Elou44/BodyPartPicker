@@ -50,7 +50,7 @@ loader.load(
         //scene.add(boxHelper);
 
         // 2. On parcourt tous les éléments du modèle (car il peut y en avoir plusieurs).
-        model.traverse((child) => {
+       /* model.traverse((child) => {
             // 3. Si l'élément est un maillage visible (un Mesh)...
             if (child.isMesh) {
                 // 4. On déplace directement sa GÉOMÉTRIE.
@@ -58,7 +58,7 @@ loader.load(
                 // Cela recentre physiquement tous les points du maillage autour de son pivot (0,0,0).
                 child.geometry.translate(-center.x, -center.y, -center.z);
             }
-        });
+        });*/
 
         // Maintenant que la géométrie est centrée, on peut redimensionner le modèle
         // pour qu'il ait une bonne taille dans la scène. L'objet "model" lui-même

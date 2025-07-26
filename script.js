@@ -116,9 +116,9 @@ spinButton.addEventListener('click', () => {
 
     // 2. Calculer une rotation cible aléatoire (plusieurs tours complets)
     const targetRotation = {
-        x: model.rotation.x + (Math.random() * 4 + 4) * 4 * Math.PI, // Rotation aléatoire sur X
+        x: model.rotation.x + (Math.random() - 0.5) * 4 * Math.PI, // Rotation aléatoire sur X
         y: model.rotation.y + (Math.random() * 4 + 4) * Math.PI, // Rotation principale sur Y (au moins 2 tours) Yaw
-        z: model.rotation.z + (Math.random() * 4 + 4) * 4 * Math.PI  // Rotation aléatoire sur Z
+        z: model.rotation.z + (Math.random() - 0.5) * 4 * Math.PI  // Rotation aléatoire sur Z
     };
 
     // 3. Animer la rotation avec GSAP pour un effet fluide

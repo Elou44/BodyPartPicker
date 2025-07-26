@@ -61,6 +61,7 @@ loader.load(
         });*/
 
         const size = box.getSize(new THREE.Vector3());
+        console.log(center);
         console.log(size);
 
         // 2. On parcourt tous les éléments du modèle (car il peut y en avoir plusieurs).
@@ -70,7 +71,7 @@ loader.load(
                 // 4. On déplace directement sa GÉOMÉTRIE.
                 // On la translate de la valeur inverse du centre.
                 // Cela recentre physiquement tous les points du maillage autour de son pivot (0,0,0).
-                child.geometry.translate(0, -center.y, 0); // X: Y:Profondeur Z:
+                child.geometry.translate(0, 0, 0); // X: Y:Profondeur Z:
             }
         });
 

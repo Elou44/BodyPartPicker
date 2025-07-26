@@ -68,6 +68,19 @@ loader.load(
         const scale = 2.0 / maxDim;
         model.scale.set(scale, scale, scale);
 
+         // 2. On parcourt tous les éléments du modèle (car il peut y en avoir plusieurs).
+        model.traverse((child) => {
+            // 3. Si l'élément est un maillage visible (un Mesh)...
+            if (child.isMesh) {
+                // 4. On déplace directement sa GÉOMÉTRIE.
+                // On la translate de la valeur inverse du centre.
+                // Cela recentre physiquement tous les points du maillage autour de son pivot (0,0,0).
+                child.geometry.translate(-center.x, -center.y + size.y / 2, -center.z);
+            }
+        });
+
+        
+
         scene.add(model);
 
 

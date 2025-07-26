@@ -60,15 +60,9 @@ loader.load(
             }
         });*/
 
-        // Maintenant que la géométrie est centrée, on peut redimensionner le modèle
-        // pour qu'il ait une bonne taille dans la scène. L'objet "model" lui-même
-        // reste à la position (0,0,0).
         const size = box.getSize(new THREE.Vector3());
-        const maxDim = Math.max(size.x, size.y, size.z);
-        const scale = 2.0 / maxDim;
-        model.scale.set(scale, scale, scale);
 
-         // 2. On parcourt tous les éléments du modèle (car il peut y en avoir plusieurs).
+        // 2. On parcourt tous les éléments du modèle (car il peut y en avoir plusieurs).
         model.traverse((child) => {
             // 3. Si l'élément est un maillage visible (un Mesh)...
             if (child.isMesh) {
@@ -78,6 +72,16 @@ loader.load(
                 child.geometry.translate(-center.x, -center.y + size.y / 2, -center.z);
             }
         });
+
+        // Maintenant que la géométrie est centrée, on peut redimensionner le modèle
+        // pour qu'il ait une bonne taille dans la scène. L'objet "model" lui-même
+        // reste à la position (0,0,0).
+        
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const scale = 2.0 / maxDim;
+        model.scale.set(scale, scale, scale);
+
+         
 
         
 

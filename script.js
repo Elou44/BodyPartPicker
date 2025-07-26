@@ -70,7 +70,7 @@ loader.load(
                 // 4. On déplace directement sa GÉOMÉTRIE.
                 // On la translate de la valeur inverse du centre.
                 // Cela recentre physiquement tous les points du maillage autour de son pivot (0,0,0).
-                child.geometry.translate(-1, 0, 0);
+                child.geometry.translate(0, -1, 0);
             }
         });
 
@@ -115,9 +115,9 @@ spinButton.addEventListener('click', () => {
 
     // 2. Calculer une rotation cible aléatoire (plusieurs tours complets)
     const targetRotation = {
-        x: model.rotation.x + (Math.random() - 0.5) * 4 * Math.PI, // Rotation aléatoire sur X
+        x: model.rotation.x /*+ (Math.random() - 0.5) * 4 * Math.PI*/, // Rotation aléatoire sur X
         y: model.rotation.y + (Math.random() * 4 + 4) * Math.PI, // Rotation principale sur Y (au moins 2 tours)
-        z: model.rotation.z + (Math.random() - 0.5) * 4 * Math.PI  // Rotation aléatoire sur Z
+        z: model.rotation.z /*+ (Math.random() - 0.5) * 4 * Math.PI*/  // Rotation aléatoire sur Z
     };
 
     // 3. Animer la rotation avec GSAP pour un effet fluide

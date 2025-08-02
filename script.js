@@ -24,7 +24,8 @@ const ambientLight = new THREE.AmbientLight(0xffffff, 0.8); // Lumière ambiante
 scene.add(ambientLight);
 
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // Lumière directionnelle pour les ombres
-directionalLight.position.set(5, 10, 7.5);
+//directionalLight.position.set(5, 10, 7.5);
+directionalLight.position.set(0, 0.5, 1);
 scene.add(directionalLight);
 
 

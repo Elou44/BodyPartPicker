@@ -74,16 +74,16 @@ spinButton.addEventListener('click', () => {
     spinButton.disabled = true;
 
     const targetRotation = {
-        x: model.rotation.x + (Math.random() - 0.5) * 4 * Math.PI,
-        y: model.rotation.y + (Math.random() * 4 + 4) * Math.PI,
-        z: model.rotation.z + (Math.random() - 0.5) * 4 * Math.PI
+        x: model.rotation.x + (Math.random() + 2) * 4 * Math.PI,  // pitch
+        y: model.rotation.y + (Math.random() * 4 + 4) * Math.PI, // yaw
+        z: model.rotation.z + /*(Math.random() - 0.5) * 4 * Math.PI*/0
     };
 
     gsap.to(model.rotation, {
         x: targetRotation.x,
         y: targetRotation.y,
         z: targetRotation.z,
-        duration: 3,
+        duration: 10,
         ease: "power2.out",
         onComplete: () => {
             spinButton.textContent = 'Reset';
@@ -102,38 +102,51 @@ function resetGame() {
 // === Spin Wheel Logic ===
 let wheelItems = loadWheelItems();
 let wheelAngle = 0;
-let spinDuration = 3000; // ms
+let spinDuration = 7000; // ms
 
-function drawWheel() {
+function drawWheel(selectedIndex = null, blink = false) {
     const items = wheelItems;
     const ctx = wheelCtx;
     const w = wheelCanvas.width;
     const h = wheelCanvas.height;
-    const centerX = w / 2;
-    const centerY = h / 2;
+    const cx = w / 2;
+    const cy = h / 2;
     const radius = w / 2;
+    const innerRadius = radius * 0.4;
     const sliceAngle = (2 * Math.PI) / items.length;
 
     ctx.clearRect(0, 0, w, h);
 
     for (let i = 0; i < items.length; i++) {
         const angle = i * sliceAngle + wheelAngle;
-        ctx.beginPath();
-        ctx.moveTo(centerX, centerY);
-        ctx.arc(centerX, centerY, radius, angle, angle + sliceAngle);
-        ctx.fillStyle = getColor(i);
-        ctx.fill();
-        ctx.save();
+        const color = (selectedIndex === i && blink) ? '#ffffff' : getColor(i);
 
-        // Text
-        ctx.translate(centerX, centerY);
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, radius, angle, angle + sliceAngle, false);
+        ctx.arc(cx, cy, innerRadius, angle + sliceAngle, angle, true); // trou intérieur
+        ctx.closePath();
+        ctx.fillStyle = color;
+        ctx.fill();
+
+        ctx.save();
+        ctx.translate(cx, cy);
         ctx.rotate(angle + sliceAngle / 2);
         ctx.textAlign = "right";
         ctx.fillStyle = "white";
-        ctx.font = "bold 14px sans-serif";
+        ctx.font = "bold 30px sans-serif";
         ctx.fillText(items[i], radius - 10, 5);
         ctx.restore();
     }
+
+    // Taquet (triangle en haut)
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - radius - 10);
+    ctx.lineTo(cx - 10, cy - radius - 25);
+    ctx.lineTo(cx + 10, cy - radius - 25);
+    ctx.closePath();
+    ctx.fillStyle = "red";
+    ctx.fill();
 }
 
 function getColor(i) {
@@ -146,23 +159,39 @@ function showAndSpinWheel() {
     drawWheel();
     wheelContainer.classList.remove('hidden');
 
-    const spinTo = Math.random() * 360 + 1080; // 3+ tours
+    const spinTo = Math.random() * 360 + 1080; // minimum 3 tours
     const start = performance.now();
 
     const animate = (now) => {
         const elapsed = now - start;
         const t = Math.min(elapsed / spinDuration, 1);
-        const eased = 1 - Math.pow(1 - t, 3);
+        const eased = 1 - Math.pow(1 - t, 2);
         wheelAngle = (spinTo * eased * Math.PI / 180) % (2 * Math.PI);
         drawWheel();
 
         if (t < 1) {
             requestAnimationFrame(animate);
+        } else {
+            // === Fin du spin : calcul de l'élément sélectionné ===
+            const spinWheelPointerAngle = -1 * (Math.PI / 2);
+            const index = Math.floor((wheelItems.length - (((wheelAngle + spinWheelPointerAngle) / (2 * Math.PI)) * wheelItems.length)) % wheelItems.length);
+
+            // === Clignotement de l'élément sélectionné ===
+            let blinkCount = 0;
+            const blinkInterval = setInterval(() => {
+                drawWheel(index, blinkCount % 2 === 0);
+                blinkCount++;
+                if (blinkCount >= 6) {
+                    clearInterval(blinkInterval);
+                    drawWheel(index, false);
+                }
+            }, 250);
         }
     };
 
     requestAnimationFrame(animate);
 }
+
 
 // === Settings ===
 settingsButton.addEventListener('click', () => {
@@ -190,10 +219,10 @@ function loadWheelItems() {
         try {
             return JSON.parse(saved);
         } catch {
-            return ['Tête', 'Bras droit', 'Bras gauche', 'Jambe droite', 'Jambe gauche'];
+            return ['👅','👀','👉','🐽','💋','💦'];
         }
     }
-    return ['Tête', 'Bras droit', 'Bras gauche', 'Jambe droite', 'Jambe gauche'];
+    return ['👅','👀','👉','🐽','💋','💦'];
 }
 
 // === Responsive Resize ===

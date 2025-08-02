@@ -25,7 +25,7 @@ html, body {
 /* Conteneur de la flèche de sélection */
 .pointer-arrow {
     position: fixed;
-    top: 50%;
+    top: calc(50% - 30px);
     left: 50%;
     transform: translate(-50%, -50%); /* Centrage parfait */
     z-index: 3; /* Au-dessus de tout */

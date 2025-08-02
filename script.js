@@ -9,7 +9,7 @@ const spinButton = document.getElementById('spin-button');
 
 // 2. Scène et Caméra
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xf0f0f0); // Fond gris clair
+scene.background = new THREE.Color(0x242424); // Fond gris clair
 
 const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.z = 3.5; // Ajuster cette valeur selon la taille du modèle

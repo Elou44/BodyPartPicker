@@ -98,15 +98,11 @@ html, body {
     border: none;
     cursor: pointer;
     color: white;
-    background-color: rgba(255, 255, 255, 0.1);
+    /*background-color: rgba(255, 255, 255, 0.1);*/
     padding: 8px 12px;
     border-radius: 50%;
     backdrop-filter: blur(4px);
     transition: background-color 0.2s;
-}
-
-#settings-button:hover {
-    background-color: rgba(255, 255, 255, 0.25);
 }
 
 /* ===== Settings Modal ===== */

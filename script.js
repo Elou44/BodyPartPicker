@@ -1,157 +1,213 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-// ========== INITIALISATION DE LA SCÈNE 3D ==========
-
-// 1. Éléments du DOM
+// DOM Elements
 const canvas = document.getElementById('render-canvas');
 const spinButton = document.getElementById('spin-button');
+const settingsButton = document.getElementById('settings-button');
+const settingsModal = document.getElementById('settings-modal');
+const wheelTextarea = document.getElementById('wheel-items');
+const saveSettingsBtn = document.getElementById('save-settings');
+const wheelCanvas = document.getElementById('spin-wheel-canvas');
+const wheelContainer = document.getElementById('spin-wheel-container');
+const wheelCtx = wheelCanvas.getContext('2d');
 
-// 2. Scène et Caméra
+// === 3D Scene ===
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x242424); // Fond gris clair
+scene.background = new THREE.Color(0x242424);
 
 const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.z = 3.5; // Ajuster cette valeur selon la taille du modèle
+camera.position.z = 3.5;
 
-// 3. Moteur de rendu
-const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Pour les écrans haute résolution
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-// 4. Éclairage
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.8); // Lumière ambiante douce
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
 scene.add(ambientLight);
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // Lumière directionnelle pour les ombres
-//directionalLight.position.set(5, 10, 7.5);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
 directionalLight.position.set(0, 0.5, 1);
 scene.add(directionalLight);
 
-
-// ========== CHARGEMENT DU MODÈLE 3D ==========
-
+// === Load Model ===
 const loader = new GLTFLoader();
-let model = null; // Variable pour stocker notre mannequin
-let boxHelper = null;
+let model = null;
 
 loader.load(
-    'human-model.glb', // Nom du fichier du modèle
+    'human-model.glb',
     (gltf) => {
         model = gltf.scene;
 
-        // --- NOUVELLE MÉTHODE DE CENTRAGE PLUS ROBUSTE ---
-
-        // 1. On calcule la boîte qui entoure l'objet pour trouver son centre.
         const box = new THREE.Box3().setFromObject(model);
         const center = box.getCenter(new THREE.Vector3());
-
-        // On crée un assistant visuel pour la boîte et on l'ajoute à la scène.
-        //const boxHelper = new THREE.Box3Helper(box, 0xffff00); // 0xffff00 est la couleur jaune
-        //scene.add(boxHelper);
-
-        // 2. On parcourt tous les éléments du modèle (car il peut y en avoir plusieurs).
-       /* model.traverse((child) => {
-            // 3. Si l'élément est un maillage visible (un Mesh)...
-            if (child.isMesh) {
-                // 4. On déplace directement sa GÉOMÉTRIE.
-                // On la translate de la valeur inverse du centre.
-                // Cela recentre physiquement tous les points du maillage autour de son pivot (0,0,0).
-                child.geometry.translate(-center.x, -center.y, -center.z);
-            }
-        });*/
-
         const size = box.getSize(new THREE.Vector3());
-        console.log(center);
-        console.log(size);
 
-        // 2. On parcourt tous les éléments du modèle (car il peut y en avoir plusieurs).
         model.traverse((child) => {
-            // 3. Si l'élément est un maillage visible (un Mesh)...
             if (child.isMesh) {
-                // 4. On déplace directement sa GÉOMÉTRIE.
-                // On la translate de la valeur inverse du centre.
-                // Cela recentre physiquement tous les points du maillage autour de son pivot (0,0,0).
-                child.geometry.translate(0, 0, 2* size.z); // X: Y:Profondeur=0 Z:
+                child.geometry.translate(0, 0, 2 * size.z);
             }
         });
 
-        // Maintenant que la géométrie est centrée, on peut redimensionner le modèle
-        // pour qu'il ait une bonne taille dans la scène. L'objet "model" lui-même
-        // reste à la position (0,0,0).
-        
         const maxDim = Math.max(size.x, size.y, size.z);
         const scale = 2.0 / maxDim;
         model.scale.set(scale, scale, scale);
 
         scene.add(model);
-
-
-        // --- ATTACHER LA BOX AU MODÈLE (NOUVELLE MÉTHODE) ---
-        // 1. On utilise BoxHelper qui prend le "model" directement en paramètre.
-        //boxHelper = new THREE.BoxHelper(model, 0xffff00); // Couleur jaune
-        // 2. On l'ajoute à la scène.
-        //model.add(boxHelper); // attache le boxHelper AU modèle
-
-        console.log("Modèle chargé et géométrie centrée !");
     },
-    undefined, // Fonction de progression (non utilisée ici)
+    undefined,
     (error) => {
-        console.error("Une erreur est survenue lors du chargement du modèle:", error);
-        alert("Impossible de charger le modèle 3D. Vérifiez que le fichier 'human-model.glb' est dans le bon dossier.");
+        console.error("Erreur de chargement du modèle :", error);
+        alert("Impossible de charger le modèle 3D.");
     }
 );
 
-
-// ========== LOGIQUE D'INTERACTION ==========
-
+// === Spin Logic ===
 spinButton.addEventListener('click', () => {
-    if (!model) return; // Ne rien faire si le modèle n'est pas encore chargé
+    if (spinButton.textContent === 'Reset') {
+        resetGame();
+        return;
+    }
 
-    // 1. Désactiver le bouton
+    if (!model) return;
+
     spinButton.disabled = true;
 
-    // 2. Calculer une rotation cible aléatoire (plusieurs tours complets)
     const targetRotation = {
-        x: model.rotation.x + (Math.random() - 0.5) * 4 * Math.PI, // Rotation aléatoire sur X
-        y: model.rotation.y + (Math.random() * 4 + 4) * Math.PI, // Rotation principale sur Y (au moins 2 tours) Yaw
-        z: model.rotation.z + (Math.random() - 0.5) * 4 * Math.PI  // Rotation aléatoire sur Z
+        x: model.rotation.x + (Math.random() - 0.5) * 4 * Math.PI,
+        y: model.rotation.y + (Math.random() * 4 + 4) * Math.PI,
+        z: model.rotation.z + (Math.random() - 0.5) * 4 * Math.PI
     };
 
-    // 3. Animer la rotation avec GSAP pour un effet fluide
     gsap.to(model.rotation, {
         x: targetRotation.x,
         y: targetRotation.y,
         z: targetRotation.z,
-        duration: 10, // Durée de l'animation en secondes
-        ease: "power2.out", // Ralentissement à la fin
+        duration: 3,
+        ease: "power2.out",
         onComplete: () => {
-            // 4. Réactiver le bouton une fois l'animation terminée
+            spinButton.textContent = 'Reset';
             spinButton.disabled = false;
+            showAndSpinWheel();
         }
     });
 });
 
+function resetGame() {
+    spinButton.textContent = 'Spin';
+    wheelContainer.classList.add('hidden');
+    drawWheel(); // redraw in case items changed
+}
 
-// ========== GESTION DU RESPONSIVE DESIGN ==========
+// === Spin Wheel Logic ===
+let wheelItems = loadWheelItems();
+let wheelAngle = 0;
+let spinDuration = 3000; // ms
 
+function drawWheel() {
+    const items = wheelItems;
+    const ctx = wheelCtx;
+    const w = wheelCanvas.width;
+    const h = wheelCanvas.height;
+    const centerX = w / 2;
+    const centerY = h / 2;
+    const radius = w / 2;
+    const sliceAngle = (2 * Math.PI) / items.length;
+
+    ctx.clearRect(0, 0, w, h);
+
+    for (let i = 0; i < items.length; i++) {
+        const angle = i * sliceAngle + wheelAngle;
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, radius, angle, angle + sliceAngle);
+        ctx.fillStyle = getColor(i);
+        ctx.fill();
+        ctx.save();
+
+        // Text
+        ctx.translate(centerX, centerY);
+        ctx.rotate(angle + sliceAngle / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "white";
+        ctx.font = "bold 14px sans-serif";
+        ctx.fillText(items[i], radius - 10, 5);
+        ctx.restore();
+    }
+}
+
+function getColor(i) {
+    const colors = ['#e74c3c', '#f1c40f', '#2ecc71', '#3498db', '#9b59b6', '#e67e22', '#1abc9c', '#34495e'];
+    return colors[i % colors.length];
+}
+
+function showAndSpinWheel() {
+    wheelAngle = 0;
+    drawWheel();
+    wheelContainer.classList.remove('hidden');
+
+    const spinTo = Math.random() * 360 + 1080; // 3+ tours
+    const start = performance.now();
+
+    const animate = (now) => {
+        const elapsed = now - start;
+        const t = Math.min(elapsed / spinDuration, 1);
+        const eased = 1 - Math.pow(1 - t, 3);
+        wheelAngle = (spinTo * eased * Math.PI / 180) % (2 * Math.PI);
+        drawWheel();
+
+        if (t < 1) {
+            requestAnimationFrame(animate);
+        }
+    };
+
+    requestAnimationFrame(animate);
+}
+
+// === Settings ===
+settingsButton.addEventListener('click', () => {
+    wheelTextarea.value = wheelItems.join('\n');
+    settingsModal.classList.remove('hidden');
+});
+
+saveSettingsBtn.addEventListener('click', () => {
+    const lines = wheelTextarea.value.split('\n').map(l => l.trim()).filter(Boolean);
+    if (lines.length > 1) {
+        wheelItems = lines;
+        saveWheelItems(wheelItems);
+        drawWheel();
+    }
+    settingsModal.classList.add('hidden');
+});
+
+function saveWheelItems(items) {
+    localStorage.setItem('spin-wheel-items', JSON.stringify(items));
+}
+
+function loadWheelItems() {
+    const saved = localStorage.getItem('spin-wheel-items');
+    if (saved) {
+        try {
+            return JSON.parse(saved);
+        } catch {
+            return ['Tête', 'Bras droit', 'Bras gauche', 'Jambe droite', 'Jambe gauche'];
+        }
+    }
+    return ['Tête', 'Bras droit', 'Bras gauche', 'Jambe droite', 'Jambe gauche'];
+}
+
+// === Responsive Resize ===
 window.addEventListener('resize', () => {
-    // Mettre à jour la taille du canvas
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-    // Mettre à jour le ratio de la caméra
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
 });
 
-
-// ========== BOUCLE D'ANIMATION ==========
-
+// === Animate Scene ===
 function animate() {
     requestAnimationFrame(animate);
-
     renderer.render(scene, camera);
 }
 
-animate(); // Démarrer la boucle de rendu
+animate();
